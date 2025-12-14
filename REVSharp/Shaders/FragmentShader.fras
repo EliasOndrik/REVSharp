@@ -1,11 +1,11 @@
 ﻿#version 330 core
         
 out vec4 out_color;
-//in vec3 farba;
-in vec2 texCoo;
-uniform sampler2D text1;
-uniform sampler2D text2;
+in vec3 farba;
+//in vec2 texCoo;
+//uniform sampler2D text1;
+//uniform sampler2D text2;
 
 void main(){
-    out_color = mix(texture(text1, texCoo), texture(text2, texCoo), 0.2);
+    out_color = vec4(farba,1.0f);
 }

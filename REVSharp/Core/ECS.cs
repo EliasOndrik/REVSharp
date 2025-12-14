@@ -60,5 +60,9 @@ namespace REVSharp.Core
         {
             behaviourManager.SetMask<T>(mask);
         }
+        public void UpdateSystems(float deltaTime) 
+        {
+            behaviourManager.UpdateSystems(deltaTime);
+        }
     }
 }

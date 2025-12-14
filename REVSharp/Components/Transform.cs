@@ -1,7 +1,7 @@
 ﻿using Silk.NET.Maths;
 using REVSharp.Core;
 
-namespace REVSharp
+namespace REVSharp.Components
 {
     internal class Transform : IComponent
     {

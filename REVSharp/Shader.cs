@@ -1,5 +1,5 @@
 ﻿using Silk.NET.OpenGL;
-using System.Numerics;
+using Silk.NET.Maths;
 namespace REVSharp
 {
     internal class Shader
@@ -46,7 +46,7 @@ namespace REVSharp
             }
             _gl.Uniform1(location, value);
         }
-        public unsafe void SetMatrix4x4(string name, Matrix4x4 value)
+        public unsafe void SetMatrix4x4(string name, Matrix4X4<float> value)
         {
             int location = _gl.GetUniformLocation(_program, name);
             if (location == -1) {

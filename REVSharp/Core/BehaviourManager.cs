@@ -33,5 +33,12 @@ namespace REVSharp.Core
                 }
             }
         }
+        public void UpdateSystems(float deltaTime) 
+        {
+            foreach (var system in registeredSystems.Values)
+            {
+                system.Update(deltaTime);
+            }
+        }
     }
 }

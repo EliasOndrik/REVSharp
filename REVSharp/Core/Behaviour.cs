@@ -13,7 +13,7 @@ namespace REVSharp.Core
         }
         public static void CManagerInit(ComponentManager componentManager) 
         {
-            CManager = componentManager;
+            CManager ??= componentManager;
         }
         public abstract void Update(float deltaTime);
     }
