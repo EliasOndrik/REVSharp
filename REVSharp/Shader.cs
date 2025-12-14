@@ -54,6 +54,14 @@ namespace REVSharp
             }
             _gl.UniformMatrix4(location, 1, false, (float*)&value);
         }
+        public unsafe void SetVector3D(string name, Vector3D<float> value)
+        {
+            int location = _gl.GetUniformLocation(_program, name);
+            if (location == -1) {
+                throw new Exception($"Uniform {name} not found in shader.");
+            }
+            _gl.Uniform3(location, 1, (float*)&value);
+        }
         private uint LoadShader(ShaderType shaderType, string shader) 
         {
             string shaderFile = File.ReadAllText(shader);

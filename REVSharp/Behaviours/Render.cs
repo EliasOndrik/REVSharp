@@ -18,8 +18,13 @@ namespace REVSharp.Behaviours
             Vector3D<float> cameraPosition = new(0.0f, 0.0f, 5.0f);
             Matrix4X4<float> view = Matrix4X4.CreateLookAt(cameraPosition, new(0.0f, 0.0f, 0.0f), new(0.0f, 1.0f, 0.0f));
             Matrix4X4<float> projection = Matrix4X4.CreatePerspectiveFieldOfView(MathF.PI / 4.0f, 800f / 600f, 0.1f, 100.0f);
+
             foreach (var entity in Entities)
             {
+                if (CManager == null)
+                {
+                    continue;
+                }
                 Transform transform = CManager.GetComponent<Transform>(entity);
                 Mesh mesh = CManager.GetComponent<Mesh>(entity);
                 _shader.Use();
@@ -31,6 +36,12 @@ namespace REVSharp.Behaviours
                 _shader.SetMatrix4x4("view", view);
                 _shader.SetMatrix4x4("projection", projection);
                 _shader.SetMatrix4x4("model", model);
+                Matrix4X4<float> result;
+                Matrix4X4.Invert(model,out result);
+                _shader.SetMatrix4x4("inverseModel", Matrix4X4.Transpose(result));
+                _shader.SetVector3D("objectColor", mesh.Color);
+                _shader.SetVector3D("lightColor", new Vector3D<float>(1.0f, 1.0f, 1.0f));
+                _shader.SetVector3D("lightPos", new Vector3D<float>(1.0f, 1.2f, 2.0f));
                 mesh.Draw();
 
             }
