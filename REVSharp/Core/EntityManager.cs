@@ -2,7 +2,7 @@
 {
     internal class EntityManager
     {
-        private static readonly Queue<uint> availableEntityIds = new();
+        private readonly Queue<uint> availableEntityIds = new();
         private const int MaxEntityCount = 100000;
         public EntityManager()
         {
@@ -11,7 +11,15 @@
                 availableEntityIds.Enqueue(i);
             }
         }
-        public static uint IntializeEntity() => availableEntityIds.Dequeue();
+        public Entity CreateEntity()
+        {
+            if (availableEntityIds.Count == 0)
+            {
+                throw new InvalidOperationException("Maximum entity limit reached.");
+            }
+            uint id = availableEntityIds.Dequeue();
+            return new Entity { Id = id, ComponentMask = 0 };
+        }
         public void DestroyEntity(Entity entity) 
         {
             availableEntityIds.Enqueue(entity.Id);

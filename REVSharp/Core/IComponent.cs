@@ -1,7 +1,7 @@
 ﻿
 namespace REVSharp.Core
 {
-    internal interface IComponent
+    public interface IComponent
     {
     }
 }

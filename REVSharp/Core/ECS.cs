@@ -2,7 +2,7 @@
 
 namespace REVSharp.Core
 {
-    internal class ECS
+    public class ECS
     {
         private readonly EntityManager entityManager;
         private readonly ComponentManager componentManager;
@@ -13,9 +13,12 @@ namespace REVSharp.Core
             entityManager = new EntityManager();
             componentManager = new ComponentManager();
             behaviourManager = new BehaviourManager();
-            Behaviour.CManagerInit(componentManager);
         }
         //Entity
+        public Entity CreateEntity()
+        {
+            return entityManager.CreateEntity();
+        }
         public void RemoveEntity(Entity entity) 
         {
             componentManager.RemoveComponents(entity);
@@ -46,7 +49,7 @@ namespace REVSharp.Core
         {
             return componentManager.GetComponent<T>(entity);
         }
-        public uint GetMask<T>() where T : IComponent
+        public uint GetComponentMask<T>() where T : IComponent
         {
             return componentManager.GetMask<T>();
         }
@@ -56,13 +59,13 @@ namespace REVSharp.Core
         {
             behaviourManager.RegisterSystem(system);
         }
-        public void SetMask<T>(uint mask) where T : Behaviour
+        public void SetSystemMask<T>(uint mask) where T : Behaviour
         {
             behaviourManager.SetMask<T>(mask);
         }
-        public void UpdateSystems(float deltaTime) 
+        public void UpdateSystems(double deltaTime) 
         {
-            behaviourManager.UpdateSystems(deltaTime);
+            behaviourManager.UpdateSystems(deltaTime, this);
         }
     }
 }

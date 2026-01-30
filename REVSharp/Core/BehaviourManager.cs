@@ -1,6 +1,4 @@
 ﻿
-using System.ComponentModel;
-
 namespace REVSharp.Core
 {
     internal class BehaviourManager
@@ -25,19 +23,27 @@ namespace REVSharp.Core
             {
                 if ((entity.ComponentMask & system.ComponentMask) == system.ComponentMask)
                 {
+                    if (system.Entities.Contains(entity))
+                    {
+                        return;
+                    }
                     system.Entities.Add(entity);
                 }
                 else 
                 {
+                    if (!system.Entities.Contains(entity))
+                    {
+                        return;
+                    }
                     system.Entities.Remove(entity);
                 }
             }
         }
-        public void UpdateSystems(float deltaTime) 
+        public void UpdateSystems(double deltaTime, ECS componentManager) 
         {
             foreach (var system in registeredSystems.Values)
             {
-                system.Update(deltaTime);
+                system.Update(deltaTime, componentManager);
             }
         }
     }

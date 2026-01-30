@@ -24,12 +24,20 @@ namespace REVSharp.Core
         public void AddComponent<T>(Entity entity, T component) where T : IComponent 
         {
             string componentName = typeof(T).Name;
+            if (HasComponent<T>(entity))
+            {
+                return;
+            }
             components[componentName].Add(entity.Id, component);
             entity.ComponentMask |= componentMasks[componentName];
         }
         public void RemoveComponent<T>(Entity entity) where T : IComponent 
         {
             string componentName = typeof(T).Name;
+            if (!HasComponent<T>(entity))
+            {
+                return;
+            }
             components[componentName].Remove(entity.Id);
             entity.ComponentMask ^= componentMasks[componentName];
         }
