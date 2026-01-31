@@ -1,11 +1,9 @@
 ﻿using Silk.NET.Maths;
 using Silk.NET.OpenGL;
-using REVSharp.Core;
-using System.Runtime.CompilerServices;
 
-namespace REVSharp.Components
+namespace REVSharp.ModelLoader
 {
-    internal class Mesh : IComponent
+    public class Mesh
     {
         public float[] Vertices{ get; set; }
         public uint[] Indices { get; set; }
@@ -22,14 +20,6 @@ namespace REVSharp.Components
             Vertices = vertices;
             Indices = indices;
             Textures = textures;
-            SetupMesh();
-        }
-        public Mesh(GL gl, float[] vertices)
-        {
-            _gl = gl;
-            Vertices = vertices;
-            Indices = [];
-            Textures = [];
             SetupMesh();
         }
         private unsafe void SetupMesh()
@@ -64,6 +54,11 @@ namespace REVSharp.Components
         }
         public unsafe void Draw()
         {
+            foreach (var text in Textures)
+            {
+                _gl.BindTexture(TextureTarget.Texture2D, text.Id);
+                _gl.ActiveTexture(GLEnum.Texture0);
+            }
             _gl.BindVertexArray(_vao);
             if (Indices.Length != 0)
             {
