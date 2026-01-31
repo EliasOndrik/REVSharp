@@ -19,37 +19,37 @@ namespace REVSharp.Core
         {
             return entityManager.CreateEntity();
         }
-        public void RemoveEntity(Entity entity) 
+        public void RemoveEntity(ref Entity entity) 
         {
-            componentManager.RemoveComponents(entity);
-            behaviourManager.EntityChangedMask(entity);
-            entityManager.DestroyEntity(entity);
+            componentManager.RemoveComponents(ref entity);
+            behaviourManager.EntityChangedMask(ref entity);
+            entityManager.DestroyEntity(ref entity);
         }
 
         //Components
-        public void RegisterComponent<T>() where T : IComponent 
+        public void RegisterComponent<T>() where T : struct 
         {
             componentManager.RegisterComponent<T>();
         }
-        public void AddComponent<T>(Entity entity, T component) where T : IComponent 
+        public void AddComponent<T>(ref Entity entity, T component) where T : struct 
         {
-            componentManager.AddComponent(entity, component);
-            behaviourManager.EntityChangedMask(entity);
+            componentManager.AddComponent(ref entity, component);
+            behaviourManager.EntityChangedMask(ref entity);
         }
-        public void RemoveComponent<T>(Entity entity) where T : IComponent
+        public void RemoveComponent<T>(ref Entity entity) where T : struct
         {
-            componentManager.RemoveComponent<T>(entity);
-            behaviourManager.EntityChangedMask(entity);
+            componentManager.RemoveComponent<T>(ref entity);
+            behaviourManager.EntityChangedMask(ref entity);
         }
-        public bool HasComponent<T>(Entity entity) where T : IComponent
+        public bool HasComponent<T>(ref Entity entity) where T : struct
         {
-            return componentManager.HasComponent<T>(entity);
+            return componentManager.HasComponent<T>(ref entity);
         }
-        public T GetComponent<T>(Entity entity) where T : IComponent
+        public ref T GetComponent<T>(ref readonly Entity entity) where T : struct
         {
-            return componentManager.GetComponent<T>(entity);
+            return ref componentManager.GetComponent<T>(in entity);
         }
-        public uint GetComponentMask<T>() where T : IComponent
+        public uint GetComponentMask<T>() where T : struct
         {
             return componentManager.GetMask<T>();
         }

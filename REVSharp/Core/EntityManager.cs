@@ -3,7 +3,7 @@
     internal class EntityManager
     {
         private readonly Queue<uint> availableEntityIds = new();
-        private const int MaxEntityCount = 100000;
+        public const int MaxEntityCount = 100000;
         public EntityManager()
         {
             for (uint i = 1; i <= MaxEntityCount; i++)
@@ -20,7 +20,7 @@
             uint id = availableEntityIds.Dequeue();
             return new Entity { Id = id, ComponentMask = 0 };
         }
-        public void DestroyEntity(Entity entity) 
+        public void DestroyEntity(ref Entity entity) 
         {
             availableEntityIds.Enqueue(entity.Id);
             entity.Id = 0;

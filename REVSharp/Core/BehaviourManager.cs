@@ -17,7 +17,7 @@ namespace REVSharp.Core
         {
             registeredSystems[typeof(T).Name].ComponentMask = mask;
         }
-        public void EntityChangedMask(Entity entity) 
+        public void EntityChangedMask(ref Entity entity) 
         {
             foreach (var system in registeredSystems.Values)
             {
