@@ -3,10 +3,10 @@ using REVSharp.Core;
 
 namespace REVSharp.Components
 {
-    internal class Transform : IComponent
+    public struct Transform : IComponent
     {
-        public Vector3D<float> Position { get; set; }
-        public Vector3D<float> Rotation { get; set; }
-        public Vector3D<float> Scale { get; set; }
+        public Vector3D<float> Position { set; get; }
+        public Vector3D<float> Rotation { set; get; }
+        public Vector3D<float> Scale { set; get; }
     }
 }

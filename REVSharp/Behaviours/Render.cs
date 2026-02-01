@@ -1,33 +1,31 @@
 ﻿using REVSharp.Core;
 using REVSharp.Components;  
 using Silk.NET.Maths;
+using REVSharp.ModelLoader;
 
 namespace REVSharp.Behaviours
 {
-    internal class Render : Behaviour
+    internal class Render(Shader shader, ModelManager modelManager) : Behaviour
     {
-        private readonly Shader _shader;
-        public Render(Shader shader)
-        {
-            _shader = shader;
+        private readonly Shader _shader = shader;
+        private readonly ModelManager _modelManager = modelManager;
 
-        }
-
-        public override void Update(float deltaTime)
+        public override void Update(double deltaTime, ECS componenetManager)
         {
-            Vector3D<float> cameraPosition = new(0.0f, 0.0f, 5.0f);
+            Vector3D<float> cameraPosition = new(0.0f, 0.0f, 10.0f);
             Matrix4X4<float> view = Matrix4X4.CreateLookAt(cameraPosition, new(0.0f, 0.0f, 0.0f), new(0.0f, 1.0f, 0.0f));
             Matrix4X4<float> projection = Matrix4X4.CreatePerspectiveFieldOfView(MathF.PI / 4.0f, 800f / 600f, 0.1f, 100.0f);
 
             foreach (var entity in Entities)
             {
-                if (CManager == null)
+                if (componenetManager == null)
                 {
                     continue;
                 }
-                Transform transform = CManager.GetComponent<Transform>(entity);
-                Mesh mesh = CManager.GetComponent<Mesh>(entity);
+                ref Transform transform = ref componenetManager.GetComponent<Transform>(in entity);
+                ref ModelId mesh = ref componenetManager.GetComponent<ModelId>(in entity);
                 _shader.Use();
+                
                 Matrix4X4<float> model = Matrix4X4.CreateScale(transform.Scale) *
                                         Matrix4X4.CreateRotationX(transform.Rotation.X) *
                                         Matrix4X4.CreateRotationY(transform.Rotation.Y) *
@@ -36,13 +34,12 @@ namespace REVSharp.Behaviours
                 _shader.SetMatrix4x4("view", view);
                 _shader.SetMatrix4x4("projection", projection);
                 _shader.SetMatrix4x4("model", model);
-                Matrix4X4<float> result;
-                Matrix4X4.Invert(model,out result);
+                Matrix4X4.Invert(model, out Matrix4X4<float> result);
                 _shader.SetMatrix4x4("inverseModel", Matrix4X4.Transpose(result));
-                _shader.SetVector3D("objectColor", mesh.Color);
+                _shader.SetVector3D("objectColor", new(0.5f,0.6f,0.2f));
                 _shader.SetVector3D("lightColor", new Vector3D<float>(1.0f, 1.0f, 1.0f));
-                _shader.SetVector3D("lightPos", new Vector3D<float>(1.0f, 1.2f, 2.0f));
-                mesh.Draw();
+                _shader.SetVector3D("lightPos", new Vector3D<float>(1.0f,1.0f,1.0f));
+                _modelManager.DrawModel(mesh.ModelIndex);
 
             }
         }
