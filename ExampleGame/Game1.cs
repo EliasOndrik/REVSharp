@@ -18,8 +18,8 @@ namespace ExampleGame
             //Ecs.AddComponent(Entity, new Transform());
             //Ecs.AddComponent(Entity, new Model(_gl, "cube.obj"));
             //Ecs.AddComponent(Entity, new Vertex());
-            _modelManager.LoadModel("cube.obj");
-            int modelId = _modelManager.GetModelIndex("cube.obj");
+            _modelManager.LoadModel("vaza.dae");
+            int modelId = _modelManager.GetModelIndex("vaza.dae");
             for (int i = 0; i < 1000; i++)
             {
                 en = Ecs.CreateEntity();
