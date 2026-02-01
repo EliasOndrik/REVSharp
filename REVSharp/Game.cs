@@ -4,53 +4,66 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using REVSharp.Core;
 using REVSharp.Components;
-using System.Drawing;
 using REVSharp.Behaviours;
-using REVSharp.Entities;
+using Microsoft.Extensions.DependencyInjection;
+using System.Drawing;
+using REVSharp.ModelLoader;
+
 
 namespace REVSharp
 {
-    internal class Game
+    public abstract class Game
     {
+        
         private readonly IWindow _window;
-        public static ECS? Ecs { get; private set; }
-        private GL _gl;
-        private Shader _shader;
-        private Cube Cube;
+
+        protected ECS Ecs { get; } = new ECS();
+        protected GL _gl;
+        protected Shader _shader;
+        protected ModelManager _modelManager;
+        
         public Game()
         {
             WindowOptions options = WindowOptions.Default;
             options.Size = new Vector2D<int>(800, 600);
             options.Title = "REVSharp Game";
-            Ecs = new ECS();
+            
             _window = Window.Create(options);
+            
             _window.Load += OnLoad;
             _window.Update += OnUpdate;
             _window.Render += OnRender;
+
         }
         private void OnLoad()
         {
             // Initialize game resources here
             _gl = _window.CreateOpenGL();
-            _gl.ClearColor(Color.AliceBlue);
+            _modelManager = new ModelManager(_gl);
             _shader = new Shader(_gl, "Shaders/VertexShader.vers", "Shaders/FragmentShader.fras");
-            _gl.Enable(EnableCap.DepthTest);
-            Ecs.RegisterComponent<Transform>();
-            Ecs.RegisterComponent<Mesh>();
+            _gl.ClearColor(Color.DarkCyan);
             
-            Render render = new(_shader);
-            Ecs.RegisterSystem(render);
-            uint mask = Ecs.GetMask<Transform>() | Ecs.GetMask<Mesh>();
-            Ecs.SetMask<Render>(mask);
+            _gl.Enable(EnableCap.DepthTest);
+            if (Ecs == null)
+                return;
+            Ecs.RegisterComponent<Transform>();
+            Ecs.RegisterComponent<ModelId>();
+            Ecs.RegisterComponent<Vertex>();
 
-            Cube = new(_gl);
+            Render render = new(_shader, _modelManager);
+            Ecs.RegisterSystem(render);
+            uint mask = Ecs.GetComponentMask<Transform>() | Ecs.GetComponentMask<ModelId>();
+            Ecs.SetSystemMask<Render>(mask);
+
+            Load();
         }
         private void OnUpdate(double deltaTime)
         {
             // Update game logic here
-            Transform transform = Ecs.GetComponent<Transform>(Cube);
-            Vector3D<float> rotation = new(Scalar.DegreesToRadians(50.0f)*(float)deltaTime, Scalar.DegreesToRadians(50.0f)*(float)deltaTime, 0f);
-            transform.Rotation += rotation;
+            if (Ecs == null)
+                return;
+            
+            Update(deltaTime);
         }
         private void OnRender(double deltaTime)
         {
@@ -58,11 +71,18 @@ namespace REVSharp
             _gl.Clear(ClearBufferMask.ColorBufferBit);
             _gl.Clear(ClearBufferMask.DepthBufferBit);
             _shader.Use();
+            if (Ecs == null)
+                return;
             Ecs.UpdateSystems((float)deltaTime);
+            Render(deltaTime);
         }
         public void Run()
         {
             _window.Run();
         }
+        protected abstract void Load();
+        protected abstract void Update(double deltaTime);
+        protected abstract void Render(double deltaTime);
+        
     }
 }
