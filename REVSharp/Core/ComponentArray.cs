@@ -24,7 +24,7 @@ namespace REVSharp.Core
             _mask = mask;
             _capacity = 1024;
             _resize = 2;
-            _sparseIndex = new uint[EntityManager.MaxEntityCount / _capacity][];
+            _sparseIndex = new uint[(EntityManager.MaxEntityCount / _capacity) + 1][];
             _denseEntities = new uint[_capacity];
             _components = new T[_capacity];
         }
@@ -39,7 +39,7 @@ namespace REVSharp.Core
             {
                 return false;
             }
-            if (_size >= _capacity)
+            if (_size >= _denseEntities.Length)
             {
                 int newCapacity = _denseEntities.Length * _resize;
                 Array.Resize(ref _denseEntities, newCapacity);
