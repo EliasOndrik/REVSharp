@@ -2,7 +2,7 @@
 using Silk.NET.Maths;
 namespace REVSharp
 {
-    internal class Shader
+    public class Shader
     {
         private readonly uint _program;
         private readonly GL _gl;
