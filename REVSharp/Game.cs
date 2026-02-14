@@ -8,6 +8,7 @@ using REVSharp.Behaviours;
 using Microsoft.Extensions.DependencyInjection;
 using System.Drawing;
 using REVSharp.ModelLoader;
+using REVSharp.Input;
 
 
 namespace REVSharp
@@ -17,18 +18,11 @@ namespace REVSharp
         
         private readonly IWindow _window;
 
-        protected ECS Ecs { get; } = new ECS();
-        protected GL _gl;
-        protected Shader _shader;
-        protected ModelManager _modelManager;
+        private GL _gl;
         
-        public Game()
+        public Game(WindowOptions windowOptions)
         {
-            WindowOptions options = WindowOptions.Default;
-            options.Size = new Vector2D<int>(800, 600);
-            options.Title = "REVSharp Game";
-            
-            _window = Window.Create(options);
+            _window = Window.Create(windowOptions);
             
             _window.Load += OnLoad;
             _window.Update += OnUpdate;
@@ -39,29 +33,19 @@ namespace REVSharp
         {
             // Initialize game resources here
             _gl = _window.CreateOpenGL();
-            _modelManager = new ModelManager(_gl);
-            _shader = new Shader(_gl, "Shaders/VertexShader.vers", "Shaders/FragmentShader.fras");
+            
+            
             _gl.ClearColor(Color.DarkCyan);
             
             _gl.Enable(EnableCap.DepthTest);
-            if (Ecs == null)
-                return;
-            Ecs.RegisterComponent<Transform>();
-            Ecs.RegisterComponent<ModelId>();
-            Ecs.RegisterComponent<Vertex>();
-
-            Render render = new(_shader, _modelManager);
-            Ecs.RegisterSystem(render);
-            uint mask = Ecs.GetComponentMask<Transform>() | Ecs.GetComponentMask<ModelId>();
-            Ecs.SetSystemMask<Render>(mask);
+            
 
             Load();
         }
         private void OnUpdate(double deltaTime)
         {
             // Update game logic here
-            if (Ecs == null)
-                return;
+            
             
             Update(deltaTime);
         }
@@ -70,10 +54,7 @@ namespace REVSharp
             // Render game here
             _gl.Clear(ClearBufferMask.ColorBufferBit);
             _gl.Clear(ClearBufferMask.DepthBufferBit);
-            _shader.Use();
-            if (Ecs == null)
-                return;
-            Ecs.UpdateSystems((float)deltaTime);
+            
             Render(deltaTime);
         }
         public void Run()
@@ -83,6 +64,32 @@ namespace REVSharp
         protected abstract void Load();
         protected abstract void Update(double deltaTime);
         protected abstract void Render(double deltaTime);
-        
+        public void InitializeDependencies(ref IServiceCollection services)
+        {
+            services.AddSingleton<IEntityComponentSystem,ECS>();
+            services.AddSingleton<IShaderManager,ShaderManager>();
+            services.AddSingleton<IModelManager,ModelManager>();
+            services.AddSingleton<Render>();
+            services.AddSingleton(_window.CreateInput());
+            services.AddSingleton(_gl);
+            services.AddSingleton<IInputManager,InputManager>();
+            services.AddSingleton<CameraManager>();
+        }
+        public void InitializeECS(ref IServiceProvider provider)
+        {
+            IEntityComponentSystem ecs = provider.GetRequiredService<IEntityComponentSystem>();
+            ecs.RegisterComponent<Transform>();
+            ecs.RegisterComponent<ModelId>();
+            ecs.RegisterComponent<Camera>();
+
+            uint renderMask = ecs.GetComponentMask<Transform>() | ecs.GetComponentMask<ModelId>();
+            Render renderSystem = provider.GetRequiredService<Render>();
+            ecs.RegisterSystem(renderSystem);
+            ecs.SetSystemMask<Render>(renderMask);
+            CameraManager cameraManager = provider.GetRequiredService<CameraManager>();
+            Entity camera = cameraManager.CreateThirdPersonCamera();
+            renderSystem.SetCamera(camera);
+
+        }
     }
 }
