@@ -7,7 +7,9 @@ layout (location = 2) in vec2 aTexCoo;
 out vec2 texCoo;
 out vec3 normal;
 out vec3 fragPos;
+out vec3 lightPosition;
 
+uniform vec3 lightPos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -16,9 +18,9 @@ uniform mat4 inverseModel;
 void main(){
     fragPos = vec3(view * model * vec4(aPosition, 1.0));
     
-    gl_Position = projection * vec4(fragPos, 1.0);
+    gl_Position = projection * view * model * vec4(aPosition, 1.0);
 
     texCoo = aTexCoo;
     normal = vec3(inverseModel * vec4(aNormal,1.0));
-    
+    lightPosition = vec3(view * vec4(lightPos, 1.0));
 }
