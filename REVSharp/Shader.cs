@@ -2,7 +2,15 @@
 using Silk.NET.Maths;
 namespace REVSharp
 {
-    public class Shader
+    public interface IShader
+    {
+        public void Use();
+        public void SetFloat(string name, float value);
+        public void SetInt(string name, int value);
+        public unsafe void SetMatrix4x4(string name, Matrix4X4<float> value);
+        public unsafe void SetVector3D(string name, Vector3D<float> value);
+    }
+    public class Shader : IShader
     {
         private readonly uint _program;
         private readonly GL _gl;
