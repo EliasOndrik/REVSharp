@@ -2,7 +2,25 @@
 
 namespace REVSharp.Core
 {
-    public class ECS
+    public interface IEntityComponentSystem
+    {
+        public Entity CreateEntity();
+        public void RemoveEntity(ref Entity entity);
+
+        //Components
+        public void RegisterComponent<T>() where T : struct;
+        public void AddComponent<T>(ref Entity entity, T component) where T : struct;
+        public void RemoveComponent<T>(ref Entity entity) where T : struct;
+        public bool HasComponent<T>(ref Entity entity) where T : struct;
+        public ref T GetComponent<T>(ref readonly Entity entity) where T : struct;
+        public uint GetComponentMask<T>() where T : struct;
+
+        //Systems
+        public void RegisterSystem<T>(T system) where T : Behaviour;
+        public void SetSystemMask<T>(uint mask) where T : Behaviour;
+        public void UpdateSystems(double deltaTime);
+    }
+    public class ECS : IEntityComponentSystem
     {
         private readonly EntityManager entityManager;
         private readonly ComponentManager componentManager;
