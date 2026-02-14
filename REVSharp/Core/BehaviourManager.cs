@@ -19,23 +19,26 @@ namespace REVSharp.Core
         }
         public void EntityChangedMask(ref Entity entity) 
         {
+            uint id = entity.Id;
             foreach (var system in registeredSystems.Values)
             {
+                int position = system.Entities.FindIndex(e => e.Id == id);
                 if ((entity.ComponentMask & system.ComponentMask) == system.ComponentMask)
                 {
-                    if (system.Entities.Contains(entity))
+                    if (position >= 0)
                     {
-                        return;
+                        continue;
                     }
                     system.Entities.Add(entity);
+                    
                 }
                 else 
                 {
-                    if (!system.Entities.Contains(entity))
+                    if (position < 0)
                     {
-                        return;
+                        continue;
                     }
-                    system.Entities.Remove(entity);
+                    system.Entities.RemoveAt(position);
                 }
             }
         }
