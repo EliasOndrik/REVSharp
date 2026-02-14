@@ -8,7 +8,6 @@ namespace REVSharp.ModelLoader
         public float[] Vertices{ get; set; }
         public uint[] Indices { get; set; }
         public List<Texture> Textures { get; set; }
-        public Vector3D<float> Color { get; set; } = new Vector3D<float>(1.0f, 1.0f, 1.0f);
         private readonly GL _gl;
         private uint _vao;
         private uint _vbo;
@@ -52,13 +51,15 @@ namespace REVSharp.ModelLoader
 
             _gl.BindVertexArray(0);
         }
-        public unsafe void Draw()
+        public unsafe void Draw(IShader shader)
         {
             foreach (var text in Textures)
             {
                 _gl.BindTexture(TextureTarget.Texture2D, text.Id);
+                shader.SetInt("image", 0);
                 _gl.ActiveTexture(GLEnum.Texture0);
             }
+
             _gl.BindVertexArray(_vao);
             if (Indices.Length != 0)
             {

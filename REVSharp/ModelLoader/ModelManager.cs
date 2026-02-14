@@ -3,11 +3,19 @@ using Silk.NET.Assimp;
 
 namespace REVSharp.ModelLoader
 {
-    public class ModelManager
+    public interface IModelManager
     {
-        private List<Model> _loadedModels;
-        private Dictionary<string, int> _modelIndex;
-        private GL _gl;
+        public void LoadModel(string path);
+
+        public int GetModelIndex(string path);
+
+        public void DrawModel(int index, IShader shader);
+    }
+    public class ModelManager : IModelManager
+    {
+        private readonly List<Model> _loadedModels;
+        private readonly Dictionary<string, int> _modelIndex;
+        private readonly GL _gl;
         
         public ModelManager(GL openGl)
         {
@@ -27,20 +35,20 @@ namespace REVSharp.ModelLoader
 
         public int GetModelIndex(string path)
         {
-            if (_modelIndex.ContainsKey(path))
+            if (_modelIndex.TryGetValue(path, out int value))
             {
-                return _modelIndex[path];
+                return value;
             }
             return -1;
         }
 
-        public void DrawModel(int index)
+        public void DrawModel(int index, IShader shader)
         {
             if (index < 0 || index >= _loadedModels.Count)
             {
                 return;
             }
-            _loadedModels[index].Draw();
+            _loadedModels[index].Draw(shader);
         }
     }
 }

@@ -23,11 +23,11 @@ namespace REVSharp.ModelLoader
             _assimp = Assimp.GetApi();
             LoadModel(path);
         }
-        public void Draw()
+        public void Draw(IShader shader)
         {
             foreach (var mesh in Meshes)
             {
-                mesh.Draw();
+                mesh.Draw(shader);
             }
         }
         private unsafe void LoadModel(string path)
@@ -40,7 +40,6 @@ namespace REVSharp.ModelLoader
             }
             Directory = Path.GetDirectoryName(path) ?? string.Empty;
             ProcessNode(scene->MRootNode, scene);
-
 
         }
         private unsafe void ProcessNode(Node* node, Scene* scene)
@@ -72,6 +71,7 @@ namespace REVSharp.ModelLoader
                 vertices.Add(mesh->MNormals[i].X);
                 vertices.Add(mesh->MNormals[i].Y);
                 vertices.Add(mesh->MNormals[i].Z);
+                
                 // Texture Coordinates
                 if (mesh->MTextureCoords[0] != null)
                 {
@@ -92,16 +92,25 @@ namespace REVSharp.ModelLoader
                     indices.Add(face.MIndices[j]);
                 }
             }
+            
             if (mesh->MMaterialIndex >= 0)
-            {
+            {                
+                
                 Material* material = scene->MMaterials[mesh->MMaterialIndex];
                 List<Texture> diffuseMaps = LoadMaterialTextures(material, TextureType.Diffuse, "texture_diffuse");
                 textures.AddRange(diffuseMaps);
                 List<Texture> specularMaps = LoadMaterialTextures(material, TextureType.Specular, "texture_specular");
                 textures.AddRange(specularMaps);
+                
             }
             return new Mesh(_gl, [.. vertices], [.. indices], textures);
         }
+        /*
+        private unsafe List<Texture> LoadTextures()
+        {
+
+            return null;
+        }*/
         private unsafe List<Texture> LoadMaterialTextures(Material* mat, TextureType type, string typeName)
         {
             List<Texture> textures = [];
@@ -160,7 +169,7 @@ namespace REVSharp.ModelLoader
                 ColorComponents.RedGreenBlue => GLEnum.Rgb,
                 _ => GLEnum.Red,
             };
-            _gl.BindTexture(TextureTarget.Texture2D, textureID);
+            _gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
             fixed (byte * buffer = image.Data)_gl.TexImage2D(TextureTarget.Texture2D, 0, (int)internalFormat, (uint)image.Width, (uint)image.Height, 0, internalFormat, PixelType.UnsignedByte, buffer);
             _gl.GenerateMipmap(TextureTarget.Texture2D);
             _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.Repeat);
