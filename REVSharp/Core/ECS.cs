@@ -19,6 +19,7 @@ namespace REVSharp.Core
         public void RegisterSystem<T>(T system) where T : Behaviour;
         public void SetSystemMask<T>(uint mask) where T : Behaviour;
         public void UpdateSystems(double deltaTime);
+        public void RenderSystems(double deltaTime);
     }
     public class ECS : IEntityComponentSystem
     {
@@ -84,6 +85,10 @@ namespace REVSharp.Core
         public void UpdateSystems(double deltaTime) 
         {
             behaviourManager.UpdateSystems(deltaTime, this);
+        }
+        public void RenderSystems(double deltaTime)
+        {
+            behaviourManager.RenderSystems(deltaTime, this);
         }
     }
 }

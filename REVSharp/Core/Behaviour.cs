@@ -11,6 +11,7 @@ namespace REVSharp.Core
             ComponentMask = 0;
         }
         
-        public abstract void Update(double deltaTime, ECS componentManager);
+        public abstract void OnUpdate(double deltaTime, ECS componentManager);
+        public abstract void OnRender(double deltaTime, ECS componentManager);
     }
 }

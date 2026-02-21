@@ -46,7 +46,14 @@ namespace REVSharp.Core
         {
             foreach (var system in registeredSystems.Values)
             {
-                system.Update(deltaTime, componentManager);
+                system.OnUpdate(deltaTime, componentManager);
+            }
+        }
+        public void RenderSystems(double deltaTime, ECS componentManager)
+        {
+            foreach (var system in registeredSystems.Values)
+            {
+                system.OnRender(deltaTime, componentManager);
             }
         }
     }
