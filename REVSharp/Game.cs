@@ -75,7 +75,7 @@ namespace REVSharp
             services.AddSingleton<IInputManager,InputManager>();
             services.AddSingleton<CameraManager>();
         }
-        public void InitializeECS(ref IServiceProvider provider)
+        public static void InitializeECS(ref IServiceProvider provider)
         {
             IEntityComponentSystem ecs = provider.GetRequiredService<IEntityComponentSystem>();
             ecs.RegisterComponent<Transform>();
