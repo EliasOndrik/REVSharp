@@ -40,7 +40,7 @@ namespace REVSharp.ModelLoader
             }
             Directory = Path.GetDirectoryName(path) ?? string.Empty;
             ProcessNode(scene->MRootNode, scene);
-
+            _assimp.ReleaseImport(scene);
         }
         private unsafe void ProcessNode(Node* node, Scene* scene)
         {
@@ -105,12 +105,6 @@ namespace REVSharp.ModelLoader
             }
             return new Mesh(_gl, [.. vertices], [.. indices], textures);
         }
-        /*
-        private unsafe List<Texture> LoadTextures()
-        {
-
-            return null;
-        }*/
         private unsafe List<Texture> LoadMaterialTextures(Material* mat, TextureType type, string typeName)
         {
             List<Texture> textures = [];
