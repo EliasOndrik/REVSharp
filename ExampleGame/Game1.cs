@@ -60,7 +60,7 @@ namespace ExampleGame
                     Rotation = new Vector3D<float>(0.0f, 0.0f, 0.0f),
                     Scale = new Vector3D<float>(1f, 1f, 1f)
                 });
-                Ecs.AddComponent(ref en, new ModelId { 
+                Ecs.AddComponent(ref en, ModelId.Default with { 
                     ModelIndex = modelId,
                     ShaderIndex = shaderId
                 });
@@ -71,12 +71,13 @@ namespace ExampleGame
 
         protected override void Render(double deltaTime)
         {
-            Ecs.UpdateSystems(deltaTime);
+            Ecs.RenderSystems(deltaTime);
+            
         }
 
         protected override void Update(double deltaTime)
         {
-            
+            Ecs.UpdateSystems(deltaTime);
         }
     }
 }

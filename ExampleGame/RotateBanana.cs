@@ -6,7 +6,12 @@ namespace ExampleGame
 {
     internal class RotateBanana : Behaviour
     {
-        public override void Update(double deltaTime, ECS componentManager)
+        public override void OnRender(double deltaTime, ECS componentManager)
+        {
+            
+        }
+
+        public override void OnUpdate(double deltaTime, ECS componentManager)
         {
             foreach (var item in Entities)
             {
