@@ -103,6 +103,26 @@ namespace REVSharp.ModelLoader
                 textures.AddRange(specularMaps);
                 
             }
+            if (textures.Count == 0)
+            {
+                uint textureID = _gl.GenTexture();
+                _gl.BindTexture(TextureTarget.Texture2D, textureID);
+                byte[] white = { 255, 255, 255, 255 };
+                
+                _gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+                fixed (byte* buffer = white) _gl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, 1, 1, 0, GLEnum.Rgba, PixelType.UnsignedByte, buffer);
+                _gl.GenerateMipmap(TextureTarget.Texture2D);
+                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.Repeat);
+                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.Repeat);
+                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear);
+                _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+                textures.Add(new Texture
+                {
+                    Id = textureID,
+                    Type = "texture_diffuse",
+                    Path = ""
+                });
+            }
             return new Mesh(_gl, [.. vertices], [.. indices], textures);
         }
         private unsafe List<Texture> LoadMaterialTextures(Material* mat, TextureType type, string typeName)
