@@ -47,6 +47,7 @@ namespace ExampleGame
             //Ecs.AddComponent(Entity, new Transform());
             //Ecs.AddComponent(Entity, new Model(_gl, "cube.obj"));
             //Ecs.AddComponent(Entity, new Vertex());
+            Random rand = new();
             _modelManager.LoadModel("vaza.dae");
             int modelId = _modelManager.GetModelIndex("vaza.dae");
             IShaderManager shaders = serviceProvider.GetRequiredService<IShaderManager>();
@@ -60,9 +61,11 @@ namespace ExampleGame
                     Rotation = new Vector3D<float>(0.0f, 0.0f, 0.0f),
                     Scale = new Vector3D<float>(1f, 1f, 1f)
                 });
-                Ecs.AddComponent(ref en, ModelId.Default with { 
+                Ecs.AddComponent(ref en, ModelId.Default with
+                {
                     ModelIndex = modelId,
-                    ShaderIndex = shaderId
+                    ShaderIndex = shaderId,
+                    Color = new Vector3D<float>((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble())
                 });
             }
             
