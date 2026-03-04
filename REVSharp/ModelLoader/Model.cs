@@ -193,5 +193,19 @@ namespace REVSharp.ModelLoader
 
             return textureID;
         }
+
+        public unsafe void DeleteModel()
+        {
+            foreach (var texture in _loadedTextures)
+            {
+                _gl.DeleteTexture(texture.Id);
+            }
+            _loadedTextures.Clear();
+            foreach (var mesh in Meshes)
+            {
+                mesh.DeleteMesh();
+            }
+            Meshes.Clear();
+        }
     }
 }

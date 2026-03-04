@@ -71,5 +71,17 @@ namespace REVSharp.ModelLoader
             }
             _gl.BindVertexArray(0);
         }
+        public unsafe void DeleteMesh()
+        {
+            _gl.DeleteVertexArray(_vao);
+            _gl.DeleteBuffer(_vbo);
+            if (Indices.Length != 0)
+            {
+                _gl.DeleteBuffer(_ebo);
+            }
+            Array.Clear(Vertices, 0, Vertices.Length);
+            Array.Clear(Indices, 0, Indices.Length);
+            Textures.Clear();
+        }
     }
 }

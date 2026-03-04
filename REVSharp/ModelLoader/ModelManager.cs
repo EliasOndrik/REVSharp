@@ -13,6 +13,7 @@ namespace REVSharp.ModelLoader
 
         public void DrawModel(int index, IShader shader);
         public bool IsColiding(int index1, Vector3D<float> position1, int index2, Vector3D<float> position2);
+        public bool DeleteModel(string path);
     }
     public class ModelManager : IModelManager
     {
@@ -82,6 +83,21 @@ namespace REVSharp.ModelLoader
                 position1.Y + box1.OffsetX.Y > position2.Y + box2.OffsetX.X &&
                 position1.Z + box1.OffsetX.X < position2.Z + box2.OffsetX.Y &&
                 position1.Z + box1.OffsetX.Y > position2.Z + box2.OffsetX.X;
+        }
+
+        public bool DeleteModel(string path)
+        {
+            
+            if (!_modelIndex.TryGetValue(path, out int index))
+            {
+                return false;
+            }
+            _loadedModels.ElementAt(index).DeleteModel();
+            _loadedModels.RemoveAt(index);
+            _modelIndex.Remove(path);
+            _colisionBoxes.RemoveAt(index);
+            return true;
+            
         }
     }
 }
