@@ -6,6 +6,7 @@ namespace REVSharp
         public void LoadShader(string name, string vertexShader, string fragmentShader);
         public int GetShaderIndex(string name);
         public IShader GetShader(int index);
+        public bool DeleteShader(string name);
     }
     public class ShaderManager : IShaderManager
     {
@@ -34,6 +35,18 @@ namespace REVSharp
         public IShader GetShader(int index)
         {
             return _shaders[index];
+        }
+
+        public bool DeleteShader(string name)
+        {
+            if (!_shaderIndex.TryGetValue(name, out int index))
+            {
+                return false;
+            }
+            _shaders.ElementAt(index).DeleteShader();
+            _shaders.RemoveAt(index);
+            _shaderIndex.Remove(name);
+            return true;
         }
     }
 }

@@ -9,6 +9,7 @@ namespace REVSharp
         public void SetInt(string name, int value);
         public unsafe void SetMatrix4x4(string name, Matrix4X4<float> value);
         public unsafe void SetVector3D(string name, Vector3D<float> value);
+        public void DeleteShader();
     }
     public class Shader : IShader
     {
@@ -85,5 +86,9 @@ namespace REVSharp
             return vertexShaderHandle;
         }
 
+        public void DeleteShader()
+        {
+            _gl.DeleteProgram(_program);
+        }
     }
 }
