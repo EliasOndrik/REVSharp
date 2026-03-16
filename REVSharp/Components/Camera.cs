@@ -11,5 +11,26 @@ namespace REVSharp.Components
         public float NearPlane { set; get; }
         public float FarPlane { set; get; }
         public float Distance { set; get; }
+
+        public static Camera FirstPersonCamera => new()
+        {
+            AspectRatio = 16.0f / 9.0f,
+            FieldOfView = 45.0f,
+            Target = new(0.0f, 0.0f, -1.0f),
+            Up = new(0.0f, 1.0f, 0.0f),
+            NearPlane = 0.1f,
+            FarPlane = 100.0f,
+            Distance = 1.0f
+        };
+        public static Camera ThirdPersonCamera => new()
+        {
+            AspectRatio = 16.0f / 9.0f,
+            FieldOfView = 45.0f,
+            Target = new(0.0f, 0.0f, 0.0f),
+            Up = new(0.0f, 1.0f, 0.0f),
+            NearPlane = 0.1f,
+            FarPlane = 100.0f,
+            Distance = 10.0f
+        };
     }
 }
