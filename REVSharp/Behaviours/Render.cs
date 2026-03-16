@@ -14,6 +14,7 @@ namespace REVSharp.Behaviours
         private readonly IShaderManager _shaders;
         private int _currentShaderIndex;
         private IShader _currentShader;
+        private Matrix4X4<float> _view;
         public Render(IShaderManager shaders, IModelManager modelManager)
         {
             _shaders = shaders;
@@ -24,7 +25,18 @@ namespace REVSharp.Behaviours
         }
         public override void OnUpdate(double deltaTime, ECS componentManager)
         {
-            
+            foreach (var entity in Entities)
+            {
+                ref Transform transform = ref componentManager.GetComponent<Transform>(in entity);
+                ref ModelId model = ref componentManager.GetComponent<ModelId>(in entity);
+                model.ModelMatrix = Matrix4X4.CreateScale(transform.Scale) *
+                                        Matrix4X4.CreateRotationX(transform.Rotation.X) *
+                                        Matrix4X4.CreateRotationY(transform.Rotation.Y) *
+                                        Matrix4X4.CreateRotationZ(transform.Rotation.Z) *
+                                        Matrix4X4.CreateTranslation(transform.Position);
+                Matrix4X4.Invert(_view * model.ModelMatrix, out Matrix4X4<float> result);
+                model.InverseModel = Matrix4X4.Transpose(result);
+            }
         }
         
         public override void OnRender(double deltaTime, ECS componentManager)
@@ -36,7 +48,7 @@ namespace REVSharp.Behaviours
             }
             ref Camera cameraInfo = ref componentManager.GetComponent<Camera>(in _camera);
             ref Transform cameraPosition = ref componentManager.GetComponent<Transform>(in _camera);
-            Matrix4X4<float> view = Matrix4X4.CreateLookAt(cameraPosition.Position, cameraInfo.Target, cameraInfo.Up);
+            _view = Matrix4X4.CreateLookAt(cameraPosition.Position, cameraInfo.Target, cameraInfo.Up);
             Matrix4X4<float> projection = Matrix4X4.CreatePerspectiveFieldOfView(Scalar.DegreesToRadians(cameraInfo.FieldOfView), cameraInfo.AspectRatio, cameraInfo.NearPlane, cameraInfo.FarPlane);
 
             foreach (var entity in Entities)
@@ -58,16 +70,11 @@ namespace REVSharp.Behaviours
                 }
                 _currentShader.Use();
 
-                Matrix4X4<float> model = Matrix4X4.CreateScale(transform.Scale) *
-                                        Matrix4X4.CreateRotationX(transform.Rotation.X) *
-                                        Matrix4X4.CreateRotationY(transform.Rotation.Y) *
-                                        Matrix4X4.CreateRotationZ(transform.Rotation.Z) *
-                                        Matrix4X4.CreateTranslation(transform.Position);
-                _currentShader.SetMatrix4x4("view", view);
+                
+                _currentShader.SetMatrix4x4("view", _view);
                 _currentShader.SetMatrix4x4("projection", projection);
-                _currentShader.SetMatrix4x4("model", model);
-                Matrix4X4.Invert(view * model, out Matrix4X4<float> result);
-                _currentShader.SetMatrix4x4("inverseModel", Matrix4X4.Transpose(result));
+                _currentShader.SetMatrix4x4("model", mesh.ModelMatrix);
+                _currentShader.SetMatrix4x4("inverseModel",mesh.InverseModel);
                 _currentShader.SetVector3D("objectColor", mesh.Color);
                 _currentShader.SetVector3D("lightColor", Vector3D<float>.One);
                 _currentShader.SetVector3D("lightPos", cameraPosition.Position);
