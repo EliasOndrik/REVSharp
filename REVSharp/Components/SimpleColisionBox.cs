@@ -1,11 +1,14 @@
 ﻿using REVSharp.Core;
-using Silk.NET.Maths;
 namespace REVSharp.Components
 {
     public struct SimpleColisionBox : IComponent
     {
-        public Vector2D<float> OffsetX { set; get; }
-        public Vector2D<float> OffsetY { set; get; }
-        public Vector2D<float> OffsetZ { set; get; }
+        public float Right { set; get; }
+        public float Left { set; get; }
+        public float Top { set; get; }
+        public float Bottom { set; get; }
+        public float Front { set; get; }
+        public float Back { set; get; }
+        
     }
 }
