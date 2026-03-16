@@ -1,5 +1,4 @@
 ﻿using Silk.NET.OpenGL;
-using Silk.NET.Assimp;
 using REVSharp.Components;
 using Silk.NET.Maths;
 
@@ -12,6 +11,7 @@ namespace REVSharp.ModelLoader
         public int GetModelIndex(string path);
 
         public void DrawModel(int index, IShader shader);
+        public void CreateColisionBox(string path, out Vector3D<float> leftBottomBack, out Vector3D<float> rightTopFront);
         public bool IsColiding(int index1, Vector3D<float> position1, int index2, Vector3D<float> position2);
         public bool DeleteModel(string path);
     }
@@ -64,9 +64,12 @@ namespace REVSharp.ModelLoader
             {
                 for (int i = 0; i < mesh.Vertices.Length / 8; i++)
                 {
-                    colisionBox.OffsetX = new Vector2D<float>(Math.Min(colisionBox.OffsetX.X, mesh.Vertices[i*8]), Math.Max(colisionBox.OffsetX.Y, mesh.Vertices[i * 8]));
-                    colisionBox.OffsetY = new Vector2D<float>(Math.Min(colisionBox.OffsetY.X, mesh.Vertices[i * 8 + 1]), Math.Max(colisionBox.OffsetY.Y, mesh.Vertices[i * 8 + 1]));
-                    colisionBox.OffsetZ = new Vector2D<float>(Math.Min(colisionBox.OffsetZ.X, mesh.Vertices[i * 8 + 2]), Math.Max(colisionBox.OffsetZ.Y, mesh.Vertices[i * 8 + 2]));
+                    colisionBox.Left = Math.Min(colisionBox.Left, mesh.Vertices[i * 8]);
+                    colisionBox.Right = Math.Max(colisionBox.Right, mesh.Vertices[i * 8]);
+                    colisionBox.Bottom = Math.Min(colisionBox.Bottom, mesh.Vertices[i * 8 + 1]);
+                    colisionBox.Top = Math.Max(colisionBox.Top, mesh.Vertices[i * 8 + 1]);
+                    colisionBox.Back = Math.Min(colisionBox.Back, mesh.Vertices[i * 8 + 2]);
+                    colisionBox.Front = Math.Max(colisionBox.Front, mesh.Vertices[i * 8 + 2]);
                 }
             }
             _colisionBoxes.Add(colisionBox);
@@ -77,12 +80,12 @@ namespace REVSharp.ModelLoader
             SimpleColisionBox box1 = _colisionBoxes[index1];
             SimpleColisionBox box2 = _colisionBoxes[index2];
 
-            return position1.X + box1.OffsetX.X < position2.X + box2.OffsetX.Y &&
-                position1.X + box1.OffsetX.Y > position2.X + box2.OffsetX.X &&
-                position1.Y + box1.OffsetX.X < position2.Y + box2.OffsetX.Y &&
-                position1.Y + box1.OffsetX.Y > position2.Y + box2.OffsetX.X &&
-                position1.Z + box1.OffsetX.X < position2.Z + box2.OffsetX.Y &&
-                position1.Z + box1.OffsetX.Y > position2.Z + box2.OffsetX.X;
+            return position1.X + box1.Left < position2.X + box2.Right &&
+                position1.X + box1.Right > position2.X + box2.Left &&
+                position1.Y + box1.Bottom < position2.Y + box2.Top &&
+                position1.Y + box1.Top > position2.Y + box2.Bottom &&
+                position1.Z + box1.Back < position2.Z + box2.Front &&
+                position1.Z + box1.Front > position2.Z + box2.Back;
         }
 
         public bool DeleteModel(string path)
@@ -98,6 +101,20 @@ namespace REVSharp.ModelLoader
             _colisionBoxes.RemoveAt(index);
             return true;
             
+        }
+
+        public void CreateColisionBox(string path, out Vector3D<float> leftBottomBack, out Vector3D<float> rightTopFront)
+        {
+            if (!_modelIndex.TryGetValue(path, out int index))
+            {
+                leftBottomBack = Vector3D<float>.Zero;
+                rightTopFront = Vector3D<float>.Zero;
+                return;
+            }
+            SimpleColisionBox box = _colisionBoxes[index];
+            leftBottomBack = new(box.Left, box.Bottom, box.Back);
+            rightTopFront = new(box.Right, box.Top, box.Front);
+
         }
     }
 }
