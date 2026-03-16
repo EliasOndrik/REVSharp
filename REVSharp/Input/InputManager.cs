@@ -16,6 +16,7 @@ namespace REVSharp.Input
         public bool IsMouseButtonReleased(MouseButton button);
 
         public Vector2D<float> GetMousePosition();
+        public void SetMousePosition(Vector2D<float> position);
 
         public float GetMouseScroll();
     }
@@ -71,7 +72,9 @@ namespace REVSharp.Input
             {
                 return false;
             }
-            return !_pressedKeys.Contains(key) && IsKeyPressed(key);
+            bool notExists = !_pressedKeys.Contains(key);
+            bool isPressed = IsKeyPressed(key);
+            return notExists && isPressed;
         }
         public bool IsKeyJustReleased(Key key)
         {
@@ -79,7 +82,9 @@ namespace REVSharp.Input
             {
                 return false;
             }
-            return _pressedKeys.Contains(key) && !IsKeyPressed(key);
+            bool exists = _pressedKeys.Contains(key);
+            bool isNotPressed = !IsKeyPressed(key);
+            return exists && isNotPressed;
         }
         
         public bool IsMouseButtonPressed(MouseButton button)
@@ -125,7 +130,14 @@ namespace REVSharp.Input
             position.Y = _mouse.Position.Y;
             return position;
         }
-
+        public void SetMousePosition(Vector2D<float> position)
+        {
+            if (_mouse == null)
+            {
+                return;
+            }
+            _mouse.Position = position.ToSystem();
+        }
         public float GetMouseScroll()
         {
             if (_mouse == null)
