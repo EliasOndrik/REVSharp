@@ -4,7 +4,7 @@ namespace REVSharp.Core
 {
     public struct Entity
     {
-        internal uint Id;
-        internal uint ComponentMask;
+        public uint Id { get; internal set; }
+        public uint ComponentMask { get; internal set; }
     }
 }
