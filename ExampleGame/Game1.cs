@@ -31,13 +31,19 @@ namespace ExampleGame
             serviceProvider = services.BuildServiceProvider();
             _modelManager = serviceProvider.GetRequiredService<IModelManager>();
             InitializeECS(ref serviceProvider);
+
             Ecs = serviceProvider.GetRequiredService<IEntityComponentSystem>();
             Render render = serviceProvider.GetRequiredService<Render>();
-            camera = render.GetCamera();
-            ref Transform cameraTransform = ref Ecs.GetComponent<Transform>(in camera);
-            cameraTransform.Position = new Vector3D<float>(0.0f, 0.0f, -10.0f);
-            ref Camera camearInfo = ref Ecs.GetComponent<Camera>(in camera);
-            camearInfo.AspectRatio = windowOptions.Size.X / (float)windowOptions.Size.Y;
+            camera = Ecs.CreateEntity();
+            Ecs.AddComponent(ref camera, Transform.Default with
+            {
+                Position = new Vector3D<float>(0.0f, 0.0f, -10.0f)
+            });
+            Ecs.AddComponent(ref camera, Camera.ThirdPersonCamera with
+            {
+                AspectRatio = windowOptions.Size.X / (float)windowOptions.Size.Y
+            });
+            render.SetCamera(camera);
 
             Ecs.RegisterSystem(new RotateBanana());
             uint mask = Ecs.GetComponentMask<Transform>();
