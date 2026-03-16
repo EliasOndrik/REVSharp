@@ -61,6 +61,10 @@ namespace REVSharp
         {
             _window.Run();
         }
+        public void Close()
+        {
+            _window.Close();
+        }
         protected abstract void Load();
         protected abstract void Update(double deltaTime);
         protected abstract void Render(double deltaTime);
@@ -86,9 +90,7 @@ namespace REVSharp
             Render renderSystem = provider.GetRequiredService<Render>();
             ecs.RegisterSystem(renderSystem);
             ecs.SetSystemMask<Render>(renderMask);
-            CameraManager cameraManager = provider.GetRequiredService<CameraManager>();
-            Entity camera = cameraManager.CreateThirdPersonCamera();
-            renderSystem.SetCamera(camera);
+            
 
         }
     }
