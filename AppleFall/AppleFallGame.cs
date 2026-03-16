@@ -60,12 +60,18 @@ namespace AppleFall
             _ecs.SetSystemMask<BasketScript>(basketScriptMaskk);
 
 
-            Entity cam = _provider.GetRequiredService<Render>().GetCamera();
+            Entity cam = _ecs.CreateEntity();
+            _ecs.AddComponent(ref cam, Camera.ThirdPersonCamera with
+            {
+                AspectRatio = _options.Size.X / (float)_options.Size.Y
+            });
+            _ecs.AddComponent(ref cam, Transform.Default with
+            {
+                Position = new(0.0f, 2f, -1.5f)
+            });
+            _provider.GetRequiredService<Render>().SetCamera(cam);
             basketScript.SetCamera(cam);
-            ref Camera camera = ref _ecs.GetComponent<Camera>(in cam);
-            ref Transform cameraPosition = ref _ecs.GetComponent<Transform>(in cam);
-            camera.AspectRatio = _options.Size.X / (float)_options.Size.Y;
-            cameraPosition.Position = new(0.0f,2f,-1.5f);
+
             int defaultShaderIndex = shaderManager.GetShaderIndex("default");
 
             _basket = _ecs.CreateEntity();
